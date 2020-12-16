@@ -6,7 +6,25 @@ cap = cv2.VideoCapture(0)
 
 PARTITION_NUM = 4
 
-#Check whether user selected camera is opened successfully.
+Kp = 0
+Ki = 0
+Kd = 0
+lastError = 0
+sumError = 0
+
+def pid(currError):
+    sumError = sumError + currError
+    turnAngle = (currError * Kp) + (sumError * Ki) + ((currError - lastError) * Kd)
+    lastError = currError
+
+    if (sumError > 500):
+        sumError = 500
+    else if (sumError < -500):
+        sumError = 500
+
+    # TODO adjust the turn angle
+    print(turnAngle)
+# Check whether user selected camera is opened successfully.
 
 if not (cap.isOpened()):
     print("Could not open video device")
@@ -27,7 +45,7 @@ def split(image, numPartitions):
     
     reconstructImage(images)
        
-    return currentError
+    return float(currentError)/PARTITION_NUM
 
 def process(image):
     height, width = image.shape[:2]
@@ -75,10 +93,8 @@ while(True):
     # Capture frame-by-frame
     ret, frame = cap.read()
 
-    split(frame, PARTITION_NUM)
-
-    # Display the resulting frame
-    # cv2.imshow('preview', frame)
+    error = split(frame, PARTITION_NUM)
+    pid(error)
 
     #Waits for a user input to quit the application
     if cv2.waitKey(1) & 0xFF == ord('q'):
