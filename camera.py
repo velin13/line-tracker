@@ -1,19 +1,37 @@
 import cv2
 import numpy as np
 import math
+import RPi.GPIO as GPIO
+import time
+
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(11,GPIO.OUT)
+servo1 = GPIO.PWM(11,50)
+servo1.start(7.5)
+
 # Open the device at the ID 0
 cap = cv2.VideoCapture(0)
 
 PARTITION_NUM = 4
 
+class PartialImageInfo:
+    def __init__(self, contour, center):
+        self.contourCtrX = contour[0]
+        self.contourCtrY = contour[1]
+        self.imageCtrX = center[0]
+        self.imageCtrY = center[1]
+    
 class Error:
-    Kp = .1
-    Ki = .1
-    Kd = .1
+    Kp = .75
+    Ki = .25
+    Kd = .25
     lastError = 0
     sumError = 0
 
 error = Error()
+
+def _map(x, in_min, in_max, out_min, out_max):
+    return (x-in_min)*(out_max-out_min)/(in_max-in_min)+out_min
 
 def pid(error, currError):
     error.Kp = error.Kp/1.0
@@ -23,7 +41,6 @@ def pid(error, currError):
     error.sumError = error.sumError + currError
     turnAngle = (currError * error.Kp) + (error.sumError * error.Ki) + ((currError - error.lastError) * error.Kd)
     print("currErr:", currError)
-    print(" sumErr:", error.sumError)
     print(" last Err:", error.lastError)
     error.lastError = currError
 
@@ -31,10 +48,10 @@ def pid(error, currError):
         error.sumError = 500
     elif (error.sumError < -500):
         error.sumError = 500
-
+    print(" sumErr:", error.sumError)
     # TODO adjust the turn angle
     print(" turnAngle:", turnAngle)
-    print("-------------------------------")
+    return turnAngle
 # Check whether user selected camera is opened successfully.
 
 if not (cap.isOpened()):
@@ -44,18 +61,33 @@ def split(image, numPartitions):
     height, width = image.shape[:2]
     partitionSize = int(height / numPartitions)
     images = []
+    points = []
 
     currentError = 0
 
     for i in range(numPartitions):
         startPartition = i * partitionSize
         partition = image[startPartition:startPartition+partitionSize, 0:width]
-        e = process(partition)
-        currentError = currentError + e
+        info = process(partition)
+        
+        # Adjust coordinate relative to full image
+        info.contourCtrY = info.contourCtrY + startPartition
+        info.imageCtrY= info.imageCtrY + startPartition
+        
+        points.append(info)
         images.append(partition)
     
-    reconstructImage(images)
-       
+    fullImage = reconstructImage(images)
+    
+    top = points[0]
+    bottom = points[PARTITION_NUM - 1]
+    
+    cv2.line(fullImage, (top.contourCtrX, top.contourCtrY), (bottom.imageCtrX, bottom.imageCtrY), (255, 0, 0), 2)
+    currentError = (-1) * int(math.degrees(math.atan((top.contourCtrX - bottom.imageCtrX) / (top.contourCtrY- bottom.imageCtrY))))
+
+    cv2.putText(fullImage, str(currentError), (100,100), cv2.FONT_HERSHEY_SIMPLEX, .75, (0,255,0), 2)
+    cv2.imshow("preview", fullImage)
+
     return currentError
 
 def process(image):
@@ -89,7 +121,7 @@ def process(image):
     
     cv2.putText(image, str(distance), ctrImage, cv2.FONT_HERSHEY_SIMPLEX, .75, (255,0,0), 2)
 
-    return distance
+    return PartialImageInfo((ctrContourX, ctrContourY), ctrImage)
 
 def reconstructImage(images):
     fullImage = images[0]
@@ -97,7 +129,9 @@ def reconstructImage(images):
     for i in range(1, len(images)):
         fullImage = np.concatenate((fullImage, images[i]), axis=0)
  
-    cv2.imshow("preview", fullImage)
+    #cv2.imshow("preview", fullImage)
+    
+    return fullImage
 
 while(True):
 
@@ -105,9 +139,15 @@ while(True):
     ret, frame = cap.read()
 
     e = split(frame, PARTITION_NUM)
-    pid(error, e)
+    turnAngle = _map(pid(error, e), -90, 90, 5, 10);
+    print("mapped turn angle: ", turnAngle);
+    print("-------------------------------")
+    servo1.ChangeDutyCycle(round(turnAngle, 1))
+
     #Waits for a user input to quit the application
     if cv2.waitKey(1) & 0xFF == ord('q'):
+        servo1.stop()
+        GPIO.cleanup()
         break
 
 # When everything done, release the capture
