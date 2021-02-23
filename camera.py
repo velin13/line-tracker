@@ -1,13 +1,8 @@
 import cv2
 import numpy as np
 import math
-import RPi.GPIO as GPIO
 import time
-
-GPIO.setmode(GPIO.BOARD)
-GPIO.setup(11,GPIO.OUT)
-servo1 = GPIO.PWM(11,50)
-servo1.start(7.5)
+import serial
 
 # Open the device at the ID 0
 cap = cv2.VideoCapture(0)
@@ -129,26 +124,33 @@ def reconstructImage(images):
     for i in range(1, len(images)):
         fullImage = np.concatenate((fullImage, images[i]), axis=0)
  
-    #cv2.imshow("preview", fullImage)
+    cv2.imshow("preview", fullImage)
     
     return fullImage
 
-while(True):
+if __name__ == '__main__':
+    ser = serial.Serial('/dev/ttyACM0', 9600, timeout=1)
+    ser.flush()
+    
+    while(True):
 
-    # Capture frame-by-frame
-    ret, frame = cap.read()
+        # Capture frame-by-frame
+        ret, frame = cap.read()
 
-    e = split(frame, PARTITION_NUM)
-    turnAngle = _map(pid(error, e), -90, 90, 5, 10);
-    print("mapped turn angle: ", turnAngle);
-    print("-------------------------------")
-    servo1.ChangeDutyCycle(round(turnAngle, 1))
-
-    #Waits for a user input to quit the application
-    if cv2.waitKey(1) & 0xFF == ord('q'):
-        servo1.stop()
-        GPIO.cleanup()
-        break
+        e = split(frame, PARTITION_NUM)
+        turnAngle = pid(error, e)
+        #turnAngle = _map(pid(error, e), -90, 90, 5, 10);
+        
+        print("mapped turn angle:", turnAngle);
+        print("-------------------------------")
+        ser = serial.Serial('/dev/ttyACM0', 9600, timeout=5)
+        ser.write(str.encode(str(round(turnAngle)+90)))
+        line = ser.readline().decode('utf-8').rstrip()
+        print(line)
+        
+        if (cv2.waitKey(1) & 0xFF == ord('q')):
+            break
+        
 
 # When everything done, release the capture
 
