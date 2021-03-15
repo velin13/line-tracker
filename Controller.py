@@ -26,7 +26,7 @@ class Controller:
             Returns calculated turn angle.
         """
         self.sumError = self.sumError + self.currentError
-        self.turnAngle = (self.currError * self.Kp) + (self.sumError * self.Ki) + ((self.currError - self.lastError) * self.Kd)
+        self.turnAngle = (self.currentError * self.Kp) + (self.sumError * self.Ki) + ((self.currentError - self.lastError) * self.Kd)
         self.lastError = self.currentError
 
         # Sum Error should not exceed +/- 500
@@ -36,8 +36,8 @@ class Controller:
             self.sumError = - 500
 
         # Debug print statements
-        print("Current Error:", self.currError)
-        print("Last Error:", self.lastError)
-        print("Sum Error:", self.sumError)
-        print("Turn Angle:", self.turnAngle)
-        return turnAngle
+        # print("Current Error:", self.currentError)
+        # print("Last Error:", self.lastError)
+        # print("Sum Error:", self.sumError)
+        # print("Turn Angle:", self.turnAngle)
+        return self.turnAngle

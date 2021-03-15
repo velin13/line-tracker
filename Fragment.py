@@ -27,13 +27,13 @@ class Fragment:
         """ Inits Fragment
 
         Args:
-        image (np.ndarry): Raw and segmented image.
+        image (np.ndarray): Raw and segmented image.
         """
         self.rawFragment = image
         self.processedFragment = image
 
-        self.height = image[0]
-        self.width = image[1]
+        self.height = image.shape[0]
+        self.width = image.shape[1]
 
         self.contourCtrX = 0
         self.contourCtrY = 0
@@ -41,14 +41,14 @@ class Fragment:
         self.relativeContourCtrX = 0
         self.relativeContourCtrY = 0
 
-        self.imageCtrX = image[1] / 2
-        self.imageCtrY = image[0] / 2
+        self.imageCtrX = image.shape[1] // 2
+        self.imageCtrY = image.shape[0] // 2
 
         self.relativeImageCtrX = 0
         self.relativeImageCtrY = 0
 
         # Filter colors and extract edges from individual fragment
-        process()
+        self.process()
 
     def setRelativeImageCtrY(self, offset):
         """ Add relative offset to relativeImageCtrY
@@ -86,7 +86,7 @@ class Fragment:
         """ Apply blur, grayscale, and threshold to image to extract edges (line) """
         
         # Obtain all contours from blurred, grayscaled, and thresholded image
-        imgray = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
+        imgray = cv2.cvtColor(self.rawFragment, cv2.COLOR_BGR2GRAY)
         blur = cv2.GaussianBlur(imgray, (7, 7), 0)
         ret, thresh = cv2.threshold(blur, 100, 255, cv2.THRESH_BINARY_INV)
         contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)

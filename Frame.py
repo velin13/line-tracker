@@ -21,8 +21,8 @@ class Frame:
         Args:
             image (np.ndarry): Image capture received from Video Camera.
         """
-        if (image.shape[0] != 1280 and image.shape[1] != 720):
-            raise Exception(image.shape[0] + "x" + image.shape[1] + " is not 1280x720")
+        if (image.shape[0] != 480 and image.shape[1] != 640):
+            raise Exception(str(image.shape[0]) + "x" + str(image.shape[1]) + " is not 480x640")
 
         self.height = image.shape[0]
         self.width = image.shape[1]
@@ -41,7 +41,7 @@ class Frame:
         # Obtain top-most and bottom-most center points
         top = self.fragments[0]
         bottom = self.fragments[PARTITION_NUM - 1]
-    
+
         # Draw line between expected center point (top) and skewed point (bottom)
         cv2.line(self.processedFrame, (top.relativeContourCtrX, top.relativeContourCtrY), (bottom.relativeImageCtrX, bottom.relativeImageCtrY), (255, 0, 0), 2)
         
