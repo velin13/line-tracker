@@ -10,6 +10,9 @@ if __name__ == '__main__':
     if capture.isOpened() == None:  
         cv2.CV_Assert("Cam open failed")
 
+    capture.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+    capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+
     controller = Controller()
 
     while(1):
