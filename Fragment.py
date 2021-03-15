@@ -22,6 +22,7 @@ class Fragment:
         relativeImageCtrX (int): X-coordinate of fragment's center point relative to full frame.
         relativeImageCtrY (int): Y-coordinate of fragment's center point relative to full frame.
     """
+
     def __init__(self, image):
         """ Inits Fragment
 

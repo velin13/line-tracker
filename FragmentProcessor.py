@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 from Frame import Frame
 from Fragment import Fragment
+from Singleton import Singleton
 
 @Singleton
 class FragmentProcessor:

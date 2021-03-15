@@ -1,3 +1,5 @@
+from Singleton import Singleton
+
 @Singleton
 class Controller:
     """ Proportional-Integral-Derivative (PID) Controller
