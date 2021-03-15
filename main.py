@@ -1,12 +1,16 @@
 import cv2
 
 from Link import Link
+from Frame import Frame
+from Controller import Controller
 
 if __name__ == '__main__':
     capture = cv2.VideoCapture(0)
 
     while(1):
 
-        retVal, image = caputre.read()
+        retVal, image = capture.read()
         if retVal:
             frame = Frame(image)
+            turnAngle = Controller.pid(frame.calculateVariation())
+            Link.transmit(turnAngle)

@@ -1,4 +1,9 @@
+PARTITION_NUM = 4
+
+import cv2
+import math
 from Fragment import Fragment
+from FragmentProcessor import FragmentProcessor
 
 class Frame:
     def __init__(self, image):
@@ -10,11 +15,20 @@ class Frame:
         self.width = image.shape[1]
         
         self.image = image
-        self.ProcessedFrame = None
 
-        self.fragment = None
+        self.fragments = FragmentProcessor.partition(image)
+        self.processedFrame = FragmentProcessor.consolidate(self.fragments)
 
+    def calculateVariation(self):
+        # Tentative/Placeholder algorithm
 
-    def calculateVariation():
-        pass    
+        # Obtain top-most and bottom-most center points
+        top = self.fragments[0]
+        bottom = self.fragments[PARTITION_NUM - 1]
+    
+        # Draw line between expected center point (top) and skewed point (bottom)
+        cv2.line(self.processedFrame, (top.relativeContourCtrX, top.relativeContourCtrY), (bottom.relativeImageCtrX, bottom.relativeImageCtrY), (255, 0, 0), 2)
         
+        # Calculate variation (distance away from center)
+        currentError = (-1) * int(math.degrees(math.atan((top.relativeContourCtrX - bottom.relativeImageCtrX) / (top.relativeContourCtrY- bottom.relativeImageCtrY))))
+        return currentError
