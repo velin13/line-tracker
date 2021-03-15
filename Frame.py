@@ -6,8 +6,21 @@ from Fragment import Fragment
 from FragmentProcessor import FragmentProcessor
 
 class Frame:
-    def __init__(self, image):
+    """ A Frame holds a raw and processed image capture
 
+    Attributes:
+        height (int): Frame height.
+        width (int): Frame width.
+        image (np.ndarry): Raw image capture.
+        fragments (list[Fragment]): Partitioned and processed fragments.
+        processedFrame (np.ndarry): Consolidated and processed fragments.
+    """
+    def __init__(self, image):
+        """ Inits Frame 
+        
+        Args:
+            image (np.ndarry): Image capture received from Video Camera.
+        """
         if (image.shape[0] != 1280 and image.shape[1] != 720):
             raise Exception(image.shape[0] + "x" + image.shape[1] + " is not 1280x720")
 
@@ -20,6 +33,9 @@ class Frame:
         self.processedFrame = FragmentProcessor.consolidate(self.fragments)
 
     def calculateVariation(self):
+        """ Calculate variation between expected center point and skewed point.
+        """
+
         # Tentative/Placeholder algorithm
 
         # Obtain top-most and bottom-most center points

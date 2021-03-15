@@ -1,7 +1,33 @@
 import cv2
 
 class Fragment:
+    """ A Fragment holds a partitioned segment of an image capture
+
+    Attributes:
+        rawFragment (np.ndarray): Partitioned raw image.
+        processedFragment (np.ndarry): Partitioned processed image.
+
+        height (int): Fragment height.
+        width (int): Fragment width.
+
+        contourCtrX (int): X-coordinate of expected (line) center point.
+        contourCtrY (int): Y-coordinate of expected (line) center point.
+
+        relativeContourCtrX (int): X-coordinate of expected (line) center point relative to full frame.
+        relativeContourCtrY (int): Y-coordinate of expected (line) center point relative to full frame.
+        
+        imageCtrX (int): X-coordinate of fragment's center point.
+        imageCtrY (int): Y-coordinate of fragments's center point.
+
+        relativeImageCtrX (int): X-coordinate of fragment's center point relative to full frame.
+        relativeImageCtrY (int): Y-coordinate of fragment's center point relative to full frame.
+    """
     def __init__(self, image):
+        """ Inits Fragment
+
+        Args:
+        image (np.ndarry): Raw and segmented image.
+        """
         self.rawFragment = image
         self.processedFragment = image
 
@@ -24,18 +50,40 @@ class Fragment:
         process()
 
     def setRelativeImageCtrY(self, offset):
+        """ Add relative offset to relativeImageCtrY
+        
+        Args:
+        offset (int): Offset.
+        """
         self.relativeImageCtrY = self.imageCtrY + offset
 
     def setRelativeImageCtrX(self, offset):
+        """ Add relative offset to relativeImageCtrX
+        
+        Args:
+        offset (int): Offset.
+        """
         self.relativeImageCtrX = self.imageCtrX + offset
 
     def setRelativeContourCtrY(self, offset):
+        """ Add relative offset to relativeContourCtrY
+        
+        Args:
+        offset (int): Offset.
+        """
         self.relativeContourCtrY = self.contourCtrY + offset
 
     def setRelativeContourCtrX(self, offset):
+        """ Add relative offset to relativeContourCtrX
+        
+        Args:
+        offset (int): Offset.
+        """
         self.relativeContourCtrX = self.contourCtrX + offset
 
     def process(self):
+        """ Apply blur, grayscale, and threshold to image to extract edges (line) """
+        
         # Obtain all contours from blurred, grayscaled, and thresholded image
         imgray = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
         blur = cv2.GaussianBlur(imgray, (7, 7), 0)

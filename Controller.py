@@ -1,6 +1,10 @@
 @Singleton
 class Controller:
+    """ Proportional-Integral-Derivative (PID) Controller
+    """
     def __init__(self):
+        """ Inits Controller """
+
         self.Kp = .75
         self.Ki = .25
         self.Kd = .25
@@ -11,6 +15,14 @@ class Controller:
         self.turnAngle = 0
 
     def pid(self, currentError):
+        """ Calculates Turn Angle 
+        
+        Args:
+            currentError (int): Current variation from expected center point.
+        
+        Returns: 
+            Returns calculated turn angle.
+        """
         self.sumError = self.sumError + self.currentError
         self.turnAngle = (self.currError * self.Kp) + (self.sumError * self.Ki) + ((self.currError - self.lastError) * self.Kd)
         self.lastError = self.currentError
@@ -26,3 +38,4 @@ class Controller:
         print("Last Error:", self.lastError)
         print("Sum Error:", self.sumError)
         print("Turn Angle:", self.turnAngle)
+        return turnAngle

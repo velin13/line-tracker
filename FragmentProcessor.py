@@ -5,10 +5,21 @@ from Fragment import Fragment
 
 @Singleton
 class FragmentProcessor:
+    """ Fragment Processor partitions and consolidates processed fragments """
+
     def __init__(self):
+        """ Inits FragmentProcessor """
         pass
 
     def partition(self, frame: np.ndarray) -> list[Fragment]:
+        """ Partition Frame into processed fragments 
+        
+        Args:
+            frame (np.ndarry): Frame to partition.
+        
+        Returns: 
+            A list of Fragments derived from Frame.
+        """
         partitionSize = frame.height / 4
         fragments = []
 
@@ -28,7 +39,15 @@ class FragmentProcessor:
 
         return fragments
 
-    def consolidate(self, fragments: Fragment) -> np.ndarry:
+    def consolidate(self, fragments: list[Fragment]) -> np.ndarry:
+        """ Consolidate partitioned Fragments.
+        
+        Args:
+            fragments (list[Fragment]): Fragments to consolidate.
+        
+        Returns: 
+            A 2d array of consolidated fragments.
+        """
         frame = fragments[0].processedFragment
 
         # Concatenate fragments into one Frame
