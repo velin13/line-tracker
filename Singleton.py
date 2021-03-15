@@ -3,7 +3,7 @@ def Singleton(cls):
     instance = {}
     
     def getInstance(*args, **kwargs):
-        """ Return instance """
+        """ Return single instance """
         if cls not in instance:
             instance[cls] = cls(*args, **kwargs)
         return instance[cls]
