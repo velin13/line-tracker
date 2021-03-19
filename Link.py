@@ -15,7 +15,7 @@ class Link(object):
 
     def transmit(self, package):
         """ Sends information to Arduino """
-        self.serial.write(str.encode(round(package) + 90))
+        self.serial.write(str.encode(str(round(package) + 90)))
 
     def receive(self):
         """ Retrieves information from Arduino """

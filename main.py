@@ -1,5 +1,5 @@
 import cv2
-#from Link import Link
+from Link import Link
 from Frame import Frame
 from Controller import Controller
 
@@ -14,6 +14,7 @@ if __name__ == '__main__':
     capture.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
     controller = Controller()
+    link = Link()
 
     while(1):
 
@@ -24,8 +25,10 @@ if __name__ == '__main__':
             turnAngle = controller.pid(frame.calculateVariation())
 
             cv2.imshow("Processed Frame", frame.processedFrame)
-            
-            #Link.transmit(turnAngle)
+  
+            link.connect()
+            link.transmit(turnAngle)
+                        
         if (cv2.waitKey(1) & 0xFF == ord('q')):
             break
         

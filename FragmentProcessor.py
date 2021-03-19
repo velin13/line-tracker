@@ -6,7 +6,7 @@ class FragmentProcessor(object):
     """ Fragment Processor partitions and consolidates processed fragments """
 
     @staticmethod
-    def partition(frame: np.ndarray) -> list[Fragment]:
+    def partition(frame):
         """ Partition Frame into processed fragments 
         
         Args:
@@ -35,7 +35,7 @@ class FragmentProcessor(object):
         return fragments
 
     @staticmethod
-    def consolidate(fragments: list[Fragment]) -> np.ndarray:
+    def consolidate(fragments):
         """ Consolidate partitioned Fragments.
         
         Args:

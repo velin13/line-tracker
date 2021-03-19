@@ -8,11 +8,10 @@ class Controller:
         """ Inits Controller """
 
         self.Kp = .75
-        self.Ki = .25
-        self.Kd = .25
+        self.Ki = .25 / 100
+        self.Kd = .25 / 100
 
         self.lastError = 0
-        self.currentError = 0
         self.sumError = 0
         self.turnAngle = 0
 
@@ -25,15 +24,15 @@ class Controller:
         Returns: 
             Returns calculated turn angle.
         """
-        self.sumError = self.sumError + self.currentError
-        self.turnAngle = (self.currentError * self.Kp) + (self.sumError * self.Ki) + ((self.currentError - self.lastError) * self.Kd)
-        self.lastError = self.currentError
+        self.sumError = self.sumError + currentError
+        self.turnAngle = (currentError * self.Kp) + (self.sumError * self.Ki) + ((currentError - self.lastError) * self.Kd)
+        self.lastError = currentError
 
         # Sum Error should not exceed +/- 500
         if (self.sumError > 500):
             self.sumError = 500
-        elif (self.sumError < - 500):
-            self.sumError = - 500
+        elif (self.sumError < -500):
+            self.sumError = -500
 
         # Debug print statements
         # print("Current Error:", self.currentError)
